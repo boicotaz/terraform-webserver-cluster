@@ -5,14 +5,14 @@ provider "aws" {
 }
 
 resource "aws_instance" "webserver" {
-  ami           = "ami-0c55b159cbfafe1f0"
-  instance_type = "t2.micro"
+  ami             = "ami-0c55b159cbfafe1f0"
+  instance_type   = "t2.micro"
   security_groups = [aws_security_group.webserver.name]
 
   user_data = <<-EOF
               #!/bin/bash
               echo "Webserver is up and running" >> index.html
-              nohup busybox httpd -f -p 8080 &
+              nohup busybox httpd -f -p ${var.webserver_port} &
               EOF
 
   tags = {
@@ -24,8 +24,8 @@ resource "aws_security_group" "webserver" {
   name = "terraform-webserver-sg"
 
   ingress {
-    from_port   = 8080
-    to_port     = 8080
+    from_port   = var.webserver_port
+    to_port     = var.webserver_port
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
