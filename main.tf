@@ -4,10 +4,22 @@ provider "aws" {
 
 }
 
-resource "aws_instance" "webserver" {
-  ami             = "ami-0c55b159cbfafe1f0"
+data "aws_vpc" "default" {
+  default = "true"
+}
+
+data "aws_subnets" "default" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.default.id]
+
+  }
+}
+
+resource "aws_launch_configuration" "webserver" {
+  image_id        = "ami-0c55b159cbfafe1f0"
   instance_type   = "t2.micro"
-  security_groups = [aws_security_group.webserver.name]
+  security_groups = [aws_security_group.webserver.id]
 
   user_data = <<-EOF
               #!/bin/bash
@@ -15,8 +27,22 @@ resource "aws_instance" "webserver" {
               nohup busybox httpd -f -p ${var.webserver_port} &
               EOF
 
-  tags = {
-    Name = "terraform-webserver"
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_autoscaling_group" "webservers" {
+  name                 = "webserver-cluster"
+  vpc_zone_identifier  = data.aws_subnets.default.ids
+  max_size             = 3
+  min_size             = 2
+  launch_configuration = aws_launch_configuration.webserver.name
+
+  tag {
+    key                 = "Name"
+    value               = "webserver"
+    propagate_at_launch = true
   }
 }
 
