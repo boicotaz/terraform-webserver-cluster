@@ -16,8 +16,23 @@ data "aws_subnets" "default" {
   }
 }
 
+data "aws_ami" "latest-ubuntu-beaver" {
+  most_recent = true
+  owners      = ["099720109477"] # Canonical
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
 resource "aws_launch_configuration" "webserver" {
-  image_id        = "ami-0c55b159cbfafe1f0"
+  image_id        = data.aws_ami.latest-ubuntu-beaver.id
   instance_type   = "t2.micro"
   security_groups = [aws_security_group.webserver.id]
 
