@@ -9,6 +9,6 @@ output "webserver_alb_address" {
 #}
 
 output "debug" {
-  value       = data.aws_subnets.default.ids
+  value       = [data.terraform_remote_state.db.outputs.address,data.terraform_remote_state.db.outputs.port] 
   description = "Debug"
 }

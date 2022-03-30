@@ -16,6 +16,16 @@ terraform {
   }
 }
 
+data "terraform_remote_state" "db" {
+  backend = "s3"
+  config = {
+    # Replace this with your bucket name!
+    bucket = "terraform-state-425832464758"
+    key    = "stage/data-stores/mysql/terraform.tfstate"
+    region = "us-east-2"
+  }
+}
+
 data "aws_vpc" "default" {
   default = "true"
 }
@@ -51,6 +61,7 @@ resource "aws_launch_configuration" "webserver" {
   user_data = <<-EOF
               #!/bin/bash
               echo "Webserver is up and running" >> index.html
+              echo "Database endpoint is: ${data.terraform_remote_state.db.outputs.address}:${data.terraform_remote_state.db.outputs.port}" >> index.html 
               nohup busybox httpd -f -p ${var.webserver_port} &
               EOF
 
