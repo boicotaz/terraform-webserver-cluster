@@ -8,7 +8,7 @@ terraform {
   backend "s3" {
     # Replace this with your bucket name!
     bucket = "terraform-state-425832464758"
-    key    = "stage/services/webcluster/terraform.tfstate"
+    key    = "stage/services/webserver-cluster/terraform.tfstate"
     region = "us-east-2"
     # Replace this with your DynamoDB table name!
     dynamodb_table = "terraform-state-locking"
