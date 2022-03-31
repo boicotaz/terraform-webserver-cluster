@@ -15,7 +15,7 @@ terraform {
 }
 
 module "mysql_database" {
-  source                    = "../../../modules/data-stores/mysql"
+  source                    = "../../modules/data-stores/mysql"
   identifier_prefix         = "webserver-cluster-mysql"
   secret_manager_arn        = "arn:aws:secretsmanager:us-east-2:425832464758:secret:stage/mysql-chDb1V"
   secret_key_mysql_password = "mysql-master-password-stage"
@@ -24,7 +24,7 @@ module "mysql_database" {
 }
 
 module "webserver_cluster" {
-  source        = "../../../modules/services/webserver-cluster"
+  source        = "../../modules/services/webserver-cluster"
   cluster_name  = "webserver-cluster"
   db_address    = module.mysql_database.address
   db_port       = module.mysql_database.port
