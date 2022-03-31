@@ -1,13 +1,3 @@
-data "terraform_remote_state" "db" {
-  backend = "s3"
-  config = {
-    # Replace this with your bucket name!
-    bucket = var.db_remote_state_bucket
-    key    = var.db_remote_state_key
-    region = var.db_remote_state_region
-  }
-}
-
 data "aws_vpc" "default" {
   default = "true"
 }
@@ -40,7 +30,7 @@ resource "aws_launch_configuration" "webserver" {
   instance_type   = var.instance_type
   security_groups = [aws_security_group.webserver.id]
 
-  user_data = templatefile("${path.module}/user_data.sh.tftpl", { db_address = data.terraform_remote_state.db.outputs.address, db_port = data.terraform_remote_state.db.outputs.port, webserver_port = var.webserver_port })
+  user_data = templatefile("${path.module}/user_data.sh.tftpl", { db_address = var.db_address, db_port = var.db_port, webserver_port = var.webserver_port })
 
   lifecycle {
     create_before_destroy = true
