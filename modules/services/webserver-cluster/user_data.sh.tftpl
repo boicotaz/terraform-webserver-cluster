@@ -1,0 +1,4 @@
+#!/bin/bash
+echo "Webserver is up and running" >> index.html
+echo "Database endpoint is: ${db_address}:${db_port}" >> index.html 
+nohup busybox httpd -f -p ${webserver_port} &
